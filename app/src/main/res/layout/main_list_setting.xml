@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#ffffff">
+    
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:stretchColumns="1" >
+
+        <TableRow>
+
+            <TextView
+			        android:id="@+id/main_list_setting_schedule_able"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="20dip"
+			        android:layout_marginRight="20dip"
+			        android:gravity="left"
+			        android:text="@string/schedule_enable"/>
+
+            <ToggleButton
+			        android:id="@+id/main_list_setting_schedule_able_toggle_button"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="20dip"
+			        android:layout_marginRight="20dip"
+			        android:textOff="@string/schedule_off"
+			        android:textOn="@string/schedule_on" />
+
+	     </TableRow>
+
+        <TableRow>
+
+            <TextView
+			        android:id="@+id/main_list_setting_max_keep"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="20dip"
+			        android:layout_marginRight="20dip"
+			        android:gravity="left"
+			        android:text="@string/max_keep"/>
+
+            
+		    <Spinner
+			        android:id="@+id/main_list_setting_max_keep_spinner"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content" />
+        </TableRow>
+    </TableLayout>
+
+    
+  
+   
+   
+
+</LinearLayout>
