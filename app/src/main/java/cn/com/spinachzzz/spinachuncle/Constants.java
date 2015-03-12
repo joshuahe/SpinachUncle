@@ -20,6 +20,8 @@ public class Constants {
     public static final String CONFIG_ID = "ID";
     public static final String CONFIG_TITLE = "TITLE";
     public static final String CONFIG_IMG = "IMG";
+
+    public static final int TASK_ADD_DIALOG_ID = 1;
     
     public static final int MAIN_SETTING_DIALOG_ID = 0;
     //10-100 are task setting dialogs

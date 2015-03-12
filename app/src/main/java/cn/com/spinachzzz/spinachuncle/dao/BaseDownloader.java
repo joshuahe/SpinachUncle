@@ -1,5 +1,10 @@
 package cn.com.spinachzzz.spinachuncle.dao;
 
+import android.os.Message;
+import android.util.Log;
+
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,15 +13,9 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.apache.commons.io.IOUtils;
-
-import android.os.Message;
-import android.util.Log;
-import cn.com.spinachzzz.spinachuncle.R;
 import cn.com.spinachzzz.spinachuncle.exception.MessageException;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.CalcUtils;
-import cn.com.spinachzzz.spinachuncle.vo.TaskSettings;
 
 public abstract class BaseDownloader implements Runnable {
 
@@ -24,9 +23,9 @@ public abstract class BaseDownloader implements Runnable {
 
     protected TaskServiceMessageHandler handler;
 
-    protected TaskSettings taskSetting;
+    //protected TaskSettings taskSetting;
 
-    protected ConfigurationDao configurationDao;
+    //protected ConfigurationDao configurationDao;
 
     protected LocalResourceDao localResourceDao = new LocalResourceDao();
 
@@ -34,13 +33,15 @@ public abstract class BaseDownloader implements Runnable {
 	this.handler = handler;
     }
 
-    public void setTaskSetting(TaskSettings taskSetting) {
-	this.taskSetting = taskSetting;
-    }
+   // public void setTaskSetting(TaskSettings taskSetting) {
+	//this.taskSetting = taskSetting;
+    //}
 
+    /**
     public void setConfigurationDao(ConfigurationDao configurationDao) {
 	this.configurationDao = configurationDao;
     }
+     **/
 
     @Override
     public void run() {
@@ -48,6 +49,7 @@ public abstract class BaseDownloader implements Runnable {
 
 	try {
 	    download();
+        /**
 
 	    localResourceDao.clean(taskSetting);
 
@@ -61,6 +63,7 @@ public abstract class BaseDownloader implements Runnable {
 			    + handler.getString(R.string.download_finished));
 
 	    handler.sendMessage(message);
+         **/
 
 	} catch (Exception e) {
 	    Log.w(TAG, e);

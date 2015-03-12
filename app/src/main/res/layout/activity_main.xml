@@ -3,30 +3,28 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:background="#000000"  >
-    
+    android:paddingRight="16dp">
+
     <ListView
         android:id="@+id/main_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollingCache="false"
-        android:divider="@drawable/line">
-    </ListView>
-    
-    <LinearLayout
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:gravity="bottom" >
+        android:divider="@drawable/line"></ListView>
 
-     <TextView
-            android:id="@+id/main_text_view"
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:gravity="bottom">
+
+        <Button
+            android:id="@+id/main_btn_add"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:textColor="#ffffff"
-            android:textIsSelectable="false"
-            />
-     </LinearLayout>
+            android:layout_gravity="right"
+            android:text="@string/add" />
+
+    </LinearLayout>
 
 </LinearLayout>

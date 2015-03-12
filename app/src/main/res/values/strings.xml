@@ -4,6 +4,20 @@
     <string name="app_name">SpinachUncle</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="add">Add</string>
+    <string name="key_word">Key Word</string>
+    <string name="date_calc">Date Calc</string>
+
+    <string name="task_name">Task Name</string>
+    <string name="browse">Browse</string>
+
+    <string name="input_url">Input URL</string>
+    <string name="keyword_before">Input keywords before target</string>
+    <string name="keyword_starts_with">Input keywords starts with target</string>
+    <string name="keyword_ends_with">Input keywords ends with target</string>
+    <string name="keyword_after">Input keywords after target</string>
+
+
     <string name="exit">Exit</string>
     <string name="apply">Apply</string>
     <string name="close">Close</string>
@@ -41,5 +55,9 @@
     </string-array>
 
     <string name="about_version">Version: 0.1 beta</string>
+    <string name="title_activity_task_add_keyword">TaskAddKeywordActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

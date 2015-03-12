@@ -5,19 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+
 import cn.com.spinachzzz.spinachuncle.Constants;
 import cn.com.spinachzzz.spinachuncle.R;
-import cn.com.spinachzzz.spinachuncle.dao.BaseDownloader;
-import cn.com.spinachzzz.spinachuncle.dao.ConfigurationDao;
-import cn.com.spinachzzz.spinachuncle.dao.DownloaderFactory;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.WifiUtils;
 import cn.com.spinachzzz.spinachuncle.vo.GlobelSettings;
-import cn.com.spinachzzz.spinachuncle.vo.TaskSettings;
 
 public class SingleTaskService extends Service {
 
-    private ConfigurationDao configDao;
+    //private ConfigurationDao configDao;
 
     private static final String TAG = SingleTaskService.class.getSimpleName();
 
@@ -29,14 +26,15 @@ public class SingleTaskService extends Service {
 
 	String taskCode = bundle.getString(Constants.TASK_CODE);
 
-	GlobelSettings globelSettings = configDao.getGlobalSetting();
+	GlobelSettings globelSettings = null;
 
 	TaskServiceMessageHandler handler = new TaskServiceMessageHandler(this);
 
 	if (WifiUtils.checkOnlineState(this, globelSettings.getOnlyWifi())) {
 	    TaskPool taskPool = TaskPool.getInstance();
 
-	    TaskSettings task = configDao.getTaskSetting(taskCode);
+        /**
+	    askSettings task = configDao.getTaskSetting(taskCode);
 
 	    BaseDownloader downloader = DownloaderFactory
 		    .createDownloader(task);
@@ -46,6 +44,7 @@ public class SingleTaskService extends Service {
 
 	    Log.i(TAG, "submit");
 	    taskPool.submit(downloader);
+         **/
 
 	} else {
 	    handler.updateMessage(getString(R.string.no_internet_conn),
@@ -64,7 +63,7 @@ public class SingleTaskService extends Service {
     @Override
     public void onCreate() {
 	Log.i(TAG, "TaskService-->onCreate");
-	configDao = new ConfigurationDao(this);
+	//configDao = new ConfigurationDao(this);
 
 	super.onCreate();
     }
@@ -72,7 +71,7 @@ public class SingleTaskService extends Service {
     @Override
     public void onDestroy() {
 	Log.i(TAG, "TaskService-->onDestroy");
-	configDao.close();
+	//configDao.close();
 	super.onDestroy();
     }
 

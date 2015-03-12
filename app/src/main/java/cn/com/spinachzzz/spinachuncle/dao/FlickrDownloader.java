@@ -86,7 +86,7 @@ public class FlickrDownloader extends BaseDownloader {
 	    HttpEntity entity = response.getEntity();
 	    if (entity != null) {
 		File folder = new File(LocalResourceDao.ROOT_FOLDER
-			+ taskSetting.getCode() + "/"
+			+ "code" + "/"
 			+ DateUtils.formatSimpleDay(new Date()));
 
 		if (!folder.exists()) {
@@ -106,13 +106,13 @@ public class FlickrDownloader extends BaseDownloader {
 		    IOUtils.closeQuietly(instream);
 		}
 
-		localResourceDao.renameFromTmp(file);
+		//localResourceDao.renameFromTmp(file);
 
 		i++;
 
-		sendDownloadingMsg(taskSetting.getLabel() + " "
-			+ handler.getString(R.string.download) + ": " + i + "/"
-			+ total);
+		//sendDownloadingMsg(taskSetting.getLabel() + " "
+		//	+ handler.getString(R.string.download) + ": " + i + "/"
+		//	+ total);
 
 	    }
 

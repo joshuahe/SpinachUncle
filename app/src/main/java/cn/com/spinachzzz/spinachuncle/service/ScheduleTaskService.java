@@ -1,30 +1,23 @@
 package cn.com.spinachzzz.spinachuncle.service;
 
-import java.util.Date;
-import java.util.List;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
-import cn.com.spinachzzz.spinachuncle.dao.BaseDownloader;
-import cn.com.spinachzzz.spinachuncle.dao.ConfigurationDao;
-import cn.com.spinachzzz.spinachuncle.dao.DownloaderFactory;
-import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
+
+import java.util.Date;
+
 import cn.com.spinachzzz.spinachuncle.util.DateUtils;
 import cn.com.spinachzzz.spinachuncle.util.WifiUtils;
 import cn.com.spinachzzz.spinachuncle.vo.GlobelSettings;
-import cn.com.spinachzzz.spinachuncle.vo.TaskSettings;
 
 public class ScheduleTaskService extends Service {
     private static final String TAG = ScheduleTaskService.class.getSimpleName();
 
-    private ConfigurationDao configDao;
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-	GlobelSettings globelSettings = configDao.getGlobalSetting();
+	GlobelSettings globelSettings =null;
 
 	if (globelSettings.getAutoConnect()) {
 
@@ -34,6 +27,7 @@ public class ScheduleTaskService extends Service {
 		if (WifiUtils.checkOnlineState(this,
 			globelSettings.getOnlyWifi())) {
 
+            /**
 		    List<TaskSettings> list = configDao.getTaskSettingList();
 
 		    TaskPool taskPool = TaskPool.getInstance();
@@ -53,9 +47,9 @@ public class ScheduleTaskService extends Service {
 			    taskPool.submit(downloader);
 			}
 		    }
-
+**/
 		    globelSettings.setLastFinishTime(new Date());
-		    configDao.updateGlobelSetting(globelSettings);
+		   // configDao.updateGlobelSetting(globelSettings);
 		}
 	    }
 
@@ -73,7 +67,7 @@ public class ScheduleTaskService extends Service {
     @Override
     public void onCreate() {
 	Log.i(TAG, "ScheduleTaskService-->onCreate");
-	configDao = new ConfigurationDao(this);
+	//configDao = new ConfigurationDao(this);
 
 	super.onCreate();
     }
@@ -81,7 +75,7 @@ public class ScheduleTaskService extends Service {
     @Override
     public void onDestroy() {
 	Log.i(TAG, "ScheduleTaskService-->onDestroy");
-	configDao.close();
+	//configDao.close();
 	super.onDestroy();
     }
 

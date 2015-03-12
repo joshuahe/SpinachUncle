@@ -17,15 +17,15 @@ public class FeiYuDownloader extends BaseDownloader {
 
 	String url = URL + fileName + EXT;
 
-	File folder = new File(LocalResourceDao.ROOT_FOLDER
-		+ taskSetting.getCode() + "/" + fileName);
-	if (!folder.exists()) {
-	    folder.mkdirs();
-	}
+	//File folder = new File(LocalResourceDao.ROOT_FOLDER
+	//	+ taskSetting.getCode() + "/" + fileName);
+	//if (!folder.exists()) {
+	  //  folder.mkdirs();
+	//}
 
-	File file = super.downFile(url, fileName + EXT + TMP_EXT, folder.getAbsolutePath(), "Download FeiYuShow");
+	//File file = super.downFile(url, fileName + EXT + TMP_EXT, folder.getAbsolutePath(), "Download FeiYuShow");
 
-	localResourceDao.renameFromTmp(file);
+	//localResourceDao.renameFromTmp(file);
 
     }
 
