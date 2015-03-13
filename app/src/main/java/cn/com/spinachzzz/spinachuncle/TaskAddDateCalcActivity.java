@@ -2,10 +2,7 @@ package cn.com.spinachzzz.spinachuncle;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,23 +10,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 
 import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 
-import java.io.File;
-
+import cn.com.spinachzzz.spinachuncle.R;
 import cn.com.spinachzzz.spinachuncle.dao.DatabaseHelper;
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.util.StringUtils;
 import cn.com.spinachzzz.spinachuncle.vo.TaskType;
 
+public class TaskAddDateCalcActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
-public class TaskAddKeywordActivity extends OrmLiteBaseActivity<DatabaseHelper> {
-
-    public static final String TAG = TaskAddKeywordActivity.class.getSimpleName();
+    public static final String TAG = TaskAddDateCalcActivity.class.getSimpleName();
 
     private static final int PICK_REQUEST_CODE = 1;
 
@@ -41,52 +35,37 @@ public class TaskAddKeywordActivity extends OrmLiteBaseActivity<DatabaseHelper> 
 
     private EditText urlEditText;
 
-    private EditText beforeEditText;
-
-    private EditText startsWithEditText;
-
-    private EditText endsWithEditText;
-
-    private EditText afterEditText;
-
     private Button addBtn;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_add_keyword);
+        setContentView(R.layout.activity_task_add_date_calc);
 
         setElements();
 
-        initAddBtn();
     }
 
     private void setElements() {
-        nameEditText = (EditText) this.findViewById(R.id.task_keyword_name);
-        savePathTv = (TextView) this.findViewById(R.id.task_keyword_save_path_tv);
-        browseBtn = (Button) this.findViewById(R.id.task_keyword_browse_btn);
-        urlEditText = (EditText) this.findViewById(R.id.task_keyword_url);
-        beforeEditText = (EditText) this.findViewById(R.id.task_keyword_before);
-        startsWithEditText = (EditText) this.findViewById(R.id.task_keyword_starts_with);
-        endsWithEditText = (EditText) this.findViewById(R.id.task_keyword_ends_with);
-        afterEditText = (EditText) this.findViewById(R.id.task_keyword_after);
+        nameEditText = (EditText) this.findViewById(R.id.task_date_calc_name);
+        savePathTv = (TextView) this.findViewById(R.id.task_date_calc_save_path_tv);
+        browseBtn = (Button) this.findViewById(R.id.task_date_calc_browse_btn);
+        urlEditText = (EditText) this.findViewById(R.id.task_date_calc_url);
 
-        addBtn = (Button) this.findViewById(R.id.task_keyword_add_btn);
+        addBtn = (Button) this.findViewById(R.id.task_date_calc_add_btn);
     }
+
 
     private void initAddBtn() {
 
         browseBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                final Intent chooserIntent = new Intent(TaskAddKeywordActivity.this, DirectoryChooserActivity.class);
+                final Intent chooserIntent = new Intent(TaskAddDateCalcActivity.this, DirectoryChooserActivity.class);
 
-// Optional: Allow users to create a new directory with a fixed name.
                 chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME,
                         "DirChooserSample");
 
-// REQUEST_DIRECTORY is a constant integer to identify the request, e.g. 0
                 startActivityForResult(chooserIntent, PICK_REQUEST_CODE);
             }
 
@@ -99,20 +78,16 @@ public class TaskAddKeywordActivity extends OrmLiteBaseActivity<DatabaseHelper> 
                 Tasks tasks = new Tasks();
                 tasks.setCode(StringUtils.createUUID());
                 tasks.setLabel(nameEditText.getText().toString());
-                tasks.setTaskType(TaskType.KEYWORD);
+                tasks.setTaskType(TaskType.DATE_CALC);
                 tasks.setSavePath(savePathTv.getText().toString());
                 tasks.setTargetUrl(urlEditText.getText().toString());
-                tasks.setKeywordBf(beforeEditText.getText().toString());
-                tasks.setKeywordSw(startsWithEditText.getText().toString());
-                tasks.setKeywordEw(endsWithEditText.getText().toString());
-                tasks.setKeywordAf(afterEditText.getText().toString());
 
-                TaskAddKeywordActivity.this.getHelper().getTasksDao().create(tasks);
+                TaskAddDateCalcActivity.this.getHelper().getTasksDao().create(tasks);
 
                 Intent intent = new Intent();
-                intent.setClass(TaskAddKeywordActivity.this,
+                intent.setClass(TaskAddDateCalcActivity.this,
                         MainActivity.class);
-                TaskAddKeywordActivity.this.startActivity(intent);
+                TaskAddDateCalcActivity.this.startActivity(intent);
             }
         });
     }
@@ -134,10 +109,11 @@ public class TaskAddKeywordActivity extends OrmLiteBaseActivity<DatabaseHelper> 
         }
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_task_add_keyword, menu);
+        getMenuInflater().inflate(R.menu.menu_task_add_date_calc, menu);
         return true;
     }
 

@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
     private MainActivityDialogs dialogs;
 
+    private RuntimeExceptionDao<Tasks, String> taskRuntimeDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +45,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
         addBtn = (Button) this.findViewById(R.id.main_btn_add);
 
-        List<Tasks> tasks = this.getHelper().getTasksDao().queryForAll();
+        taskRuntimeDao = this.getHelper().getTasksDao();
+
+        List<Tasks> tasks = taskRuntimeDao.queryForAll();
 
         List<? extends Map<String, ?>> tasksData = ApplicationContext.getInstance().getTasksService().convertToAdapterMap(tasks);
 
@@ -77,6 +82,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         });
     }
 
+    public RuntimeExceptionDao<Tasks, String> getTaskRuntimeDao() {
+        return taskRuntimeDao;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,10 +127,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
             //dialogs.createGlobelSettingDialog(builder, factory);
 
             return builder.create();
-        } else if (id >= Constants.TASK_SETTING_DIALOG_ID && id < 100) {
-            //dialogs.createTaskSettingDialog(bundle, builder, factory);
+        } else if (id >= Constants.TASK_DIALOG_ID && id < 100) {
+            return dialogs.createTaskDialog(bundle, builder, factory);
 
-            return builder.create();
         }
         return super.onCreateDialog(id);
     }

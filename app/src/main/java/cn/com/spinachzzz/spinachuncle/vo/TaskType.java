@@ -5,5 +5,5 @@ package cn.com.spinachzzz.spinachuncle.vo;
  */
 public enum TaskType {
 
-    KEYWORD
+    KEYWORD, DATE_CALC,
 }

@@ -4,8 +4,32 @@ import java.util.UUID;
 
 public class StringUtils {
 
-    public static String createUUID(){
+    public static String createUUID() {
         return UUID.randomUUID().toString();
+    }
+
+
+    public static boolean isURL(String url) {
+        if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public static String removeBraces(String input) {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c != '{' && c != '}') {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString();
     }
 
     public static String getFileName(String str) {

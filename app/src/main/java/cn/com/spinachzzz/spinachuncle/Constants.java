@@ -24,8 +24,8 @@ public class Constants {
     public static final int TASK_ADD_DIALOG_ID = 1;
     
     public static final int MAIN_SETTING_DIALOG_ID = 0;
-    //10-100 are task setting dialogs
-    public static final int TASK_SETTING_DIALOG_ID = 10;
+    //10-100 are single task dialogs
+    public static final int TASK_DIALOG_ID = 10;
 
     public static final int TIMER_SERVICE_CODE = 0;
     

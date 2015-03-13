@@ -13,9 +13,12 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
 
+import cn.com.spinachzzz.spinachuncle.Constants;
+import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.exception.MessageException;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.CalcUtils;
+import cn.com.spinachzzz.spinachuncle.util.CommonUtils;
 
 public abstract class BaseDownloader implements Runnable {
 
@@ -29,125 +32,125 @@ public abstract class BaseDownloader implements Runnable {
 
     protected LocalResourceDao localResourceDao = new LocalResourceDao();
 
+    protected Tasks tasks;
+
     public void setHandler(TaskServiceMessageHandler handler) {
-	this.handler = handler;
+        this.handler = handler;
     }
 
-   // public void setTaskSetting(TaskSettings taskSetting) {
-	//this.taskSetting = taskSetting;
+    // public void setTaskSetting(TaskSettings taskSetting) {
+    //this.taskSetting = taskSetting;
     //}
 
     /**
-    public void setConfigurationDao(ConfigurationDao configurationDao) {
-	this.configurationDao = configurationDao;
-    }
-     **/
+     * public void setConfigurationDao(ConfigurationDao configurationDao) {
+     * this.configurationDao = configurationDao;
+     * }
+     */
 
     @Override
     public void run() {
-	handler.startNotify();
+        handler.startNotify();
 
-	try {
-	    download();
-        /**
+        try {
+            download();
+            /**
 
-	    localResourceDao.clean(taskSetting);
+             localResourceDao.clean(taskSetting);
 
-	    // configurationDao.updateTaskSetting(taskSetting);
+             // configurationDao.updateTaskSetting(taskSetting);
 
-	    Message message = new Message();
-	    message.what = TaskServiceMessageHandler.DOWNLOAD_COMPLETE;
-	    message.getData().putString(
-		    TaskServiceMessageHandler.MSG_KEY,
-		    taskSetting.getLabel() + " "
-			    + handler.getString(R.string.download_finished));
+             Message message = new Message();
+             message.what = TaskServiceMessageHandler.DOWNLOAD_COMPLETE;
+             message.getData().putString(
+             TaskServiceMessageHandler.MSG_KEY,
+             taskSetting.getLabel() + " "
+             + handler.getString(R.string.download_finished));
 
-	    handler.sendMessage(message);
-         **/
+             handler.sendMessage(message);
+             **/
 
-	} catch (Exception e) {
-	    Log.w(TAG, e);
+        } catch (Exception e) {
+            Log.w(TAG, e);
 
-	    Message message = new Message();
-	    message.what = TaskServiceMessageHandler.DOWNLOAD_FAIL;
-	    message.getData().putString(TaskServiceMessageHandler.MSG_KEY,
-		    e.getMessage());
-	    handler.sendMessage(message);
+            Message message = new Message();
+            message.what = TaskServiceMessageHandler.DOWNLOAD_FAIL;
+            message.getData().putString(TaskServiceMessageHandler.MSG_KEY,
+                    e.getMessage());
+            handler.sendMessage(message);
 
-	}
+        }
     }
 
     protected abstract void download() throws Exception;
 
     protected void sendDownloadingMsg(String msg) {
-	Message message = new Message();
-	message.what = TaskServiceMessageHandler.DOWNLOADING;
-	message.getData().putString(TaskServiceMessageHandler.MSG_KEY, msg);
-	handler.sendMessage(message);
+        Message message = new Message();
+        message.what = TaskServiceMessageHandler.DOWNLOADING;
+        message.getData().putString(TaskServiceMessageHandler.MSG_KEY, msg);
+        handler.sendMessage(message);
     }
 
-    protected File downFile(String url, String fileName, String path, String msg)
-	    throws IOException {
-	if (path.charAt(path.length() - 1) != '/') {
-	    path = path + "/";
-	}
+    protected void downFile(String url, File saveFile, String msg)
+            throws IOException {
 
-	File file = new File(path + fileName);
+        File tempFile = new File(saveFile.getPath()+ Constants.TMP_EXT);
 
-	URL myURL = new URL(url);
-	URLConnection conn = myURL.openConnection();
-	conn.connect();
-	InputStream is = null;
-	FileOutputStream fos = null;
+        URL myURL = new URL(url);
+        URLConnection conn = myURL.openConnection();
+        conn.connect();
+        InputStream is = null;
+        FileOutputStream fos = null;
 
-	try {
-	    is = conn.getInputStream();
-	    int fileSize = conn.getContentLength();
-	    if (fileSize <= 0)
-		throw new MessageException("Unknown file size.");
-	    if (is == null)
-		throw new MessageException("Unknown source.");
+        try {
+            is = conn.getInputStream();
+            int fileSize = conn.getContentLength();
+            if (fileSize <= 0) {
+                throw new MessageException("Unknown file size.");
+            }
+            if (is == null) {
+                throw new MessageException("Unknown source.");
+            }
 
-	    BigDecimal total = BigDecimal.valueOf(fileSize);
+            BigDecimal total = BigDecimal.valueOf(fileSize);
 
-	    fos = new FileOutputStream(file);
+            fos = new FileOutputStream(tempFile);
 
-	    byte buf[] = new byte[1024 * 4];
-	    int downLoadFileSize = 0;
-	    int lastPercent = 0;
-	    sendPercentMessage(downLoadFileSize, total, lastPercent, msg);
-	    while (downLoadFileSize <= fileSize) {
+            byte buf[] = new byte[1024 * 4];
+            int downLoadFileSize = 0;
+            int lastPercent = 0;
+            sendPercentMessage(downLoadFileSize, total, lastPercent, msg);
+            while (downLoadFileSize <= fileSize) {
 
-		int numread = is.read(buf);
-		if (numread == -1) {
-		    break;
-		}
-		fos.write(buf, 0, numread);
-		downLoadFileSize += numread;
+                int numRead = is.read(buf);
+                if (numRead == -1) {
+                    break;
+                }
+                fos.write(buf, 0, numRead);
+                downLoadFileSize += numRead;
 
-		lastPercent = sendPercentMessage(downLoadFileSize, total,
-			lastPercent, msg);
-	    }
-	} finally {
-	    IOUtils.closeQuietly(is);
-	    IOUtils.closeQuietly(fos);
-	}
+                lastPercent = sendPercentMessage(downLoadFileSize, total,
+                        lastPercent, msg);
+            }
+        } finally {
+            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(fos);
+        }
 
-	return file;
-
+        CommonUtils.renameFromTmp(tempFile);
     }
 
     private String createPercentMsg(int percent, String msg) {
-	return msg + " " + percent + "%";
+        return msg + " " + percent + "%";
     }
 
     private int sendPercentMessage(int downLoadFileSize, BigDecimal total,
-	    int lastPercent, String msg) {
-	int percent = CalcUtils.calculatePercent(downLoadFileSize, total);
-	if (percent - lastPercent >= 1) {
-	  
-	    sendDownloadingMsg(createPercentMsg(percent, msg));
-	}
-	return percent;
+                                   int lastPercent, String msg) {
+        int percent = CalcUtils.calculatePercent(downLoadFileSize, total);
+        if (percent - lastPercent >= 1) {
+
+            sendDownloadingMsg(createPercentMsg(percent, msg));
+        }
+        return percent;
     }
 }

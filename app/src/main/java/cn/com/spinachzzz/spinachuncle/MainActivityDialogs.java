@@ -1,11 +1,23 @@
 package cn.com.spinachzzz.spinachuncle;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.ToggleButton;
+
+import com.j256.ormlite.dao.RuntimeExceptionDao;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import cn.com.spinachzzz.spinachuncle.domain.Tasks;
+import cn.com.spinachzzz.spinachuncle.service.SingleTaskService;
 
 public class MainActivityDialogs {
 
@@ -16,7 +28,7 @@ public class MainActivityDialogs {
     }
 
     public AlertDialog createAddTaskDialog(AlertDialog.Builder builder,
-                                    LayoutInflater factory) {
+                                           LayoutInflater factory) {
 
         final View mainAddTaskDialogView = factory.inflate(R.layout.main_add_task_dialog,
                 null);
@@ -36,102 +48,104 @@ public class MainActivityDialogs {
             }
         });
 
+
+        RadioButton dateCalcRtn = (RadioButton) mainAddTaskDialogView.findViewById(R.id.main_radio_date_calc);
+
+        dateCalcRtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent();
+
+                intent.setClass(mainActivity,
+                        TaskAddDateCalcActivity.class);
+                mainActivity.startActivity(intent);
+            }
+        });
+
         return builder.create();
     }
 
     /**
-     public void createGlobelSettingDialog(AlertDialog.Builder builder,
-     LayoutInflater factory) {
+     * public void createGlobelSettingDialog(AlertDialog.Builder builder,
+     * LayoutInflater factory) {
+     * <p/>
+     * final GlobelSettings globelSetting = mainActivity.getGlobelSetting();
+     * final ConfigurationDao configDao = mainActivity.getConfigDao();
+     * <p/>
+     * final View mainSettingView = factory.inflate(R.layout.main_setting,
+     * null);
+     * <p/>
+     * final TimePicker scheduleTime = (TimePicker) mainSettingView
+     * .findViewById(R.id.main_setting_schedule_date);
+     * final ToggleButton autoWifi = (ToggleButton) mainSettingView
+     * .findViewById(R.id.main_setting_auto_wifi_toggle);
+     * final ToggleButton wifiOnly = (ToggleButton) mainSettingView
+     * .findViewById(R.id.main_setting_wifi_only_toggle);
+     * <p/>
+     * Log.i(MainActivity.TAG, globelSetting.toString());
+     * <p/>
+     * scheduleTime.setCurrentHour(globelSetting.getScheduleHour());
+     * scheduleTime.setCurrentMinute(globelSetting.getScheduleMin());
+     * autoWifi.setChecked(globelSetting.getAutoConnect());
+     * wifiOnly.setChecked(globelSetting.getOnlyWifi());
+     * <p/>
+     * builder.setIcon(R.drawable.setting);
+     * builder.setTitle(R.string.settings);
+     * builder.setView(mainSettingView);
+     * builder.setPositiveButton(R.string.apply,
+     * new DialogInterface.OnClickListener() {
+     * public void onClick(DialogInterface dialog, int whichButton) {
+     * globelSetting.setScheduleTime(
+     * scheduleTime.getCurrentHour(),
+     * scheduleTime.getCurrentMinute());
+     * globelSetting.setAutoConnect(autoWifi.isChecked());
+     * globelSetting.setOnlyWifi(wifiOnly.isChecked());
+     * <p/>
+     * configDao.updateGlobelSetting(globelSetting);
+     * //mainActivity.startTimeTask();
+     * }
+     * });
+     * <p/>
+     * }
+     */
 
-     final GlobelSettings globelSetting = mainActivity.getGlobelSetting();
-     final ConfigurationDao configDao = mainActivity.getConfigDao();
+    public AlertDialog createTaskDialog(Bundle bundle,
+                                        AlertDialog.Builder builder, LayoutInflater factory) {
 
-     final View mainSettingView = factory.inflate(R.layout.main_setting,
-     null);
+        final RuntimeExceptionDao<Tasks, String> taskDAO = mainActivity.getTaskRuntimeDao();
 
-     final TimePicker scheduleTime = (TimePicker) mainSettingView
-     .findViewById(R.id.main_setting_schedule_date);
-     final ToggleButton autoWifi = (ToggleButton) mainSettingView
-     .findViewById(R.id.main_setting_auto_wifi_toggle);
-     final ToggleButton wifiOnly = (ToggleButton) mainSettingView
-     .findViewById(R.id.main_setting_wifi_only_toggle);
+        String code = bundle.getString("code");
 
-     Log.i(MainActivity.TAG, globelSetting.toString());
+        Log.i(MainActivity.TAG, "code:" + code);
 
-     scheduleTime.setCurrentHour(globelSetting.getScheduleHour());
-     scheduleTime.setCurrentMinute(globelSetting.getScheduleMin());
-     autoWifi.setChecked(globelSetting.getAutoConnect());
-     wifiOnly.setChecked(globelSetting.getOnlyWifi());
+        final Tasks task = taskDAO.queryForId(code);
 
-     builder.setIcon(R.drawable.setting);
-     builder.setTitle(R.string.settings);
-     builder.setView(mainSettingView);
-     builder.setPositiveButton(R.string.apply,
-     new DialogInterface.OnClickListener() {
-     public void onClick(DialogInterface dialog, int whichButton) {
-     globelSetting.setScheduleTime(
-     scheduleTime.getCurrentHour(),
-     scheduleTime.getCurrentMinute());
-     globelSetting.setAutoConnect(autoWifi.isChecked());
-     globelSetting.setOnlyWifi(wifiOnly.isChecked());
+        final View taskDialogView = factory.inflate(R.layout.main_list_task,
+                null);
+        builder.setView(taskDialogView);
 
-     configDao.updateGlobelSetting(globelSetting);
-     //mainActivity.startTimeTask();
-     }
-     });
+        final Button tastStartBtn = (Button) taskDialogView
+                .findViewById(R.id.task_start);
 
-     }
+        tastStartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i(MainActivity.TAG, task.toString());
 
+                Intent intent = new Intent();
+                intent.setClass(mainActivity, SingleTaskService.class);
+                intent.putExtra("task", task);
 
+                mainActivity.startService(intent);
 
-     public void createTaskSettingDialog(Bundle bundle,
-     AlertDialog.Builder builder, LayoutInflater factory) {
+                mainActivity.dismissDialog(Constants.TASK_DIALOG_ID);
 
-     /**
-     final ConfigurationDao configDao = mainActivity.getConfigDao();
+            }
+        });
 
-     String code = bundle.getString(TaskSettings.CODE);
-
-     Log.i(MainActivity.TAG, "code:" + code);
-
-
-     final TaskSettings currentTaskSetting = configDao.getTaskSetting(code);
-
-     final View settingView = factory.inflate(R.layout.main_list_setting,
-     null);
-
-     Log.i(MainActivity.TAG, currentTaskSetting.toString());
-     final ToggleButton scheduleAbleToggleButton = (ToggleButton) settingView
-     .findViewById(R.id.main_list_setting_schedule_able_toggle_button);
-     scheduleAbleToggleButton.setChecked(currentTaskSetting
-     .getScheduleAble());
-
-     final Spinner maxKeepSpinner = (Spinner) settingView
-     .findViewById(R.id.main_list_setting_max_keep_spinner);
-     ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-     mainActivity, R.array.max_keep_array,
-     android.R.layout.simple_spinner_item);
-     // Specify the layout to use when the list of choices appears
-     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-     // Apply the adapter to the spinner
-     maxKeepSpinner.setAdapter(adapter);
-     maxKeepSpinner.setSelection(currentTaskSetting.getMaxKeepPos());
-
-     builder.setIcon(R.drawable.setting);
-     builder.setTitle(currentTaskSetting.getLabel() + " " + mainActivity.getString(R.string.settings));
-     builder.setView(settingView);
-     builder.setPositiveButton(R.string.apply,
-     new DialogInterface.OnClickListener() {
-     public void onClick(DialogInterface dialog, int whichButton) {
-     currentTaskSetting.setScheduleAble(scheduleAbleToggleButton.isChecked());
-     currentTaskSetting.setMaxKeepByPos((int) maxKeepSpinner.getSelectedItemId());
-
-     configDao.updateTaskSetting(currentTaskSetting);
-     }
-     });
-
-
-     }
-     **/
+        AlertDialog dialog =  builder.create();
+        return dialog;
+    }
 
 }

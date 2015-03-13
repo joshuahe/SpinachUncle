@@ -3,6 +3,8 @@ package cn.com.spinachzzz.spinachuncle.domain;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 import cn.com.spinachzzz.spinachuncle.vo.TaskType;
 
 /**
@@ -10,7 +12,7 @@ import cn.com.spinachzzz.spinachuncle.vo.TaskType;
  */
 
 @DatabaseTable(tableName = "TASKS")
-public class Tasks {
+public class Tasks implements Serializable{
 
     @DatabaseField(id = true)
     private String code;
@@ -120,6 +122,22 @@ public class Tasks {
 
     public void setKeywordAf(String keywordAf) {
         this.keywordAf = keywordAf;
+    }
+
+    @Override
+    public String toString() {
+        return "Tasks{" +
+                "code='" + code + '\'' +
+                ", label='" + label + '\'' +
+                ", taskType=" + taskType +
+                ", savePath='" + savePath + '\'' +
+                ", maxKeep=" + maxKeep +
+                ", targetUrl='" + targetUrl + '\'' +
+                ", keywordBf='" + keywordBf + '\'' +
+                ", keywordSw='" + keywordSw + '\'' +
+                ", keywordEw='" + keywordEw + '\'' +
+                ", keywordAf='" + keywordAf + '\'' +
+                '}';
     }
 }
 

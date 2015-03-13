@@ -8,6 +8,9 @@ import android.util.Log;
 
 import cn.com.spinachzzz.spinachuncle.Constants;
 import cn.com.spinachzzz.spinachuncle.R;
+import cn.com.spinachzzz.spinachuncle.dao.BaseDownloader;
+import cn.com.spinachzzz.spinachuncle.dao.DownloaderFactory;
+import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.WifiUtils;
 import cn.com.spinachzzz.spinachuncle.vo.GlobelSettings;
@@ -20,59 +23,50 @@ public class SingleTaskService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-	Log.i(TAG, "SingleTaskService-->onStartCommand");
+        Log.i(TAG, "SingleTaskService-->onStartCommand");
 
-	Bundle bundle = intent.getExtras();
+        Tasks task = (Tasks)intent.getSerializableExtra("task");
 
-	String taskCode = bundle.getString(Constants.TASK_CODE);
+        TaskServiceMessageHandler handler = new TaskServiceMessageHandler(this);
 
-	GlobelSettings globelSettings = null;
+        if (WifiUtils.checkOnlineState(this, true)) {
+            TaskPool taskPool = TaskPool.getInstance();
 
-	TaskServiceMessageHandler handler = new TaskServiceMessageHandler(this);
+            BaseDownloader downloader = DownloaderFactory
+                    .createDownloader(task);
+            downloader.setHandler(handler);
 
-	if (WifiUtils.checkOnlineState(this, globelSettings.getOnlyWifi())) {
-	    TaskPool taskPool = TaskPool.getInstance();
+            Log.i(TAG, "submit");
+            taskPool.submit(downloader);
 
-        /**
-	    askSettings task = configDao.getTaskSetting(taskCode);
 
-	    BaseDownloader downloader = DownloaderFactory
-		    .createDownloader(task);
-	    downloader.setHandler(handler);
-	    downloader.setConfigurationDao(configDao);
-	    downloader.setTaskSetting(task);
+        } else {
+            handler.updateMessage(getString(R.string.no_internet_conn),
+                    getString(R.string.download_fail));
+        }
 
-	    Log.i(TAG, "submit");
-	    taskPool.submit(downloader);
-         **/
-
-	} else {
-	    handler.updateMessage(getString(R.string.no_internet_conn),
-		    getString(R.string.download_fail));
-	}
-
-	return START_NOT_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-	Log.i(TAG, "TaskService-->onBind");
-	return null;
+        Log.i(TAG, "TaskService-->onBind");
+        return null;
     }
 
     @Override
     public void onCreate() {
-	Log.i(TAG, "TaskService-->onCreate");
-	//configDao = new ConfigurationDao(this);
+        Log.i(TAG, "TaskService-->onCreate");
+        //configDao = new ConfigurationDao(this);
 
-	super.onCreate();
+        super.onCreate();
     }
 
     @Override
     public void onDestroy() {
-	Log.i(TAG, "TaskService-->onDestroy");
-	//configDao.close();
-	super.onDestroy();
+        Log.i(TAG, "TaskService-->onDestroy");
+        //configDao.close();
+        super.onDestroy();
     }
 
 }

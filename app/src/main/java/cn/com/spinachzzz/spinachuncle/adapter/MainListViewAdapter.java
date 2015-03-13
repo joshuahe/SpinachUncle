@@ -1,6 +1,8 @@
 package cn.com.spinachzzz.spinachuncle.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import android.widget.SimpleAdapter;
 import java.util.List;
 import java.util.Map;
 
+import cn.com.spinachzzz.spinachuncle.Constants;
 import cn.com.spinachzzz.spinachuncle.R;
 
 public class MainListViewAdapter extends SimpleAdapter {
@@ -36,7 +39,19 @@ public class MainListViewAdapter extends SimpleAdapter {
             convertView = mInflater.inflate(R.layout.main_list_item, null);
         }
 
-        final Map<String, ?> item = data.get(position);
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Map<String, ?> item = data.get(position);
+                String code = (String)item.get("code");
+
+                Activity activity = (Activity) context;
+                Bundle bundle = new Bundle();
+                bundle.putString("code", code);
+                activity.showDialog(Constants.TASK_DIALOG_ID+position,
+                        bundle);
+            }
+        });
 
         return super.getView(position, convertView, parent);
     }

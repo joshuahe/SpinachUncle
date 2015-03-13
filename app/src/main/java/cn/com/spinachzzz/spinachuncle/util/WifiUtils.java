@@ -12,47 +12,47 @@ public class WifiUtils {
     public static WifiLock wifiLock;
 
     public static boolean checkOnlineState(Context context, boolean wifiOnly) {
-	ConnectivityManager conManager = (ConnectivityManager) context
-		.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager conManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
 
-	State state = conManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();   
+        State state = conManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();
 
-	if (state != null && state == State.CONNECTED) {
-	    conManager.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
-	    return true;
+        if (state != null && state == State.CONNECTED) {
+            conManager.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
+            return true;
 
-	}
-	
-	state = conManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();  
-	
-	if ((!wifiOnly) && state != null
-		&& state == State.CONNECTED) {
-	    return true;
-	}
-	
-	return false;
+        }
+
+        state = conManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
+
+        if ((!wifiOnly) && state != null
+                && state == State.CONNECTED) {
+            return true;
+        }
+
+        return false;
 
     }
 
     public static void openWifi(Context context) {
-	WifiManager wifiManager = (WifiManager) context
-		.getSystemService(Context.WIFI_SERVICE);
-	wifiLock = wifiManager.createWifiLock(LOCK_NAME);
-	wifiLock.setReferenceCounted(false);
-	wifiManager.setWifiEnabled(true);
+        WifiManager wifiManager = (WifiManager) context
+                .getSystemService(Context.WIFI_SERVICE);
+        wifiLock = wifiManager.createWifiLock(LOCK_NAME);
+        wifiLock.setReferenceCounted(false);
+        wifiManager.setWifiEnabled(true);
 
-	wifiLock.acquire();
+        wifiLock.acquire();
 
     }
 
     public static void closeWifi(Context context) {
-	WifiManager wifiManager = (WifiManager) context
-		.getSystemService(Context.WIFI_SERVICE);
-	wifiManager.setWifiEnabled(false);
+        WifiManager wifiManager = (WifiManager) context
+                .getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(false);
 
-	if (wifiLock != null) {
-	    wifiLock.release();
-	    wifiLock = null;
-	}
+        if (wifiLock != null) {
+            wifiLock.release();
+            wifiLock = null;
+        }
     }
 }

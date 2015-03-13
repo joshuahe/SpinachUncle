@@ -1,26 +1,24 @@
 package cn.com.spinachzzz.spinachuncle.dao;
 
 import cn.com.spinachzzz.spinachuncle.Constants;
+import cn.com.spinachzzz.spinachuncle.domain.Tasks;
+import cn.com.spinachzzz.spinachuncle.vo.TaskType;
 
 public class DownloaderFactory {
 
-    public static BaseDownloader createDownloader() {
+    public static BaseDownloader createDownloader(Tasks task) {
         BaseDownloader baseDownloader = null;
 
-        String code = "";
+        if (task.getTaskType() == TaskType.KEYWORD) {
+            baseDownloader = new KeywordDownloader(task);
 
-        if (code.equalsIgnoreCase(Constants.FLICKR_CODE)) {
-            baseDownloader = new FlickrDownloader();
-
-        } else if (code.equalsIgnoreCase(Constants.MOKO_CODE)) {
-        } else if (code.equalsIgnoreCase(Constants.PCONLINE_CODE)) {
-            //baseDownloader = new PCOnlineDownloader();
-        } else if (code.equalsIgnoreCase(Constants.FEIYU_CODE)) {
-            baseDownloader = new FeiYuDownloader();
         }
 
-        return baseDownloader;
+        else if(task.getTaskType() == TaskType.DATE_CALC){
+            baseDownloader = new DateCalcDownloader(task);
 
+        }
+        return baseDownloader;
     }
 
 }
