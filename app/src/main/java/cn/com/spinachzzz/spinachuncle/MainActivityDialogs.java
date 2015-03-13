@@ -3,6 +3,7 @@ package cn.com.spinachzzz.spinachuncle;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.ToggleButton;
 
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -125,13 +127,13 @@ public class MainActivityDialogs {
                 null);
         builder.setView(taskDialogView);
 
-        final Button tastStartBtn = (Button) taskDialogView
+        final Button taskStartBtn = (Button) taskDialogView
                 .findViewById(R.id.task_start);
+        final Button taskOpenBth = (Button) taskDialogView.findViewById(R.id.task_open);
 
-        tastStartBtn.setOnClickListener(new View.OnClickListener() {
+        taskStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(MainActivity.TAG, task.toString());
 
                 Intent intent = new Intent();
                 intent.setClass(mainActivity, SingleTaskService.class);
@@ -141,6 +143,17 @@ public class MainActivityDialogs {
 
                 mainActivity.dismissDialog(Constants.TASK_DIALOG_ID);
 
+            }
+        });
+
+        taskOpenBth.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Uri startDir = Uri.fromFile(new File(task.getSavePath()));
+                Intent intent = new Intent();
+                intent.setDataAndType(startDir,"resource/folder");
+                intent.setAction(Intent.ACTION_VIEW);
+                mainActivity.startActivity(intent);
             }
         });
 

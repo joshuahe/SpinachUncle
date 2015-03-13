@@ -23,4 +23,11 @@
         android:text="Delete"
         android:id="@+id/tast_delete"
         android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open"
+        android:id="@+id/task_open"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

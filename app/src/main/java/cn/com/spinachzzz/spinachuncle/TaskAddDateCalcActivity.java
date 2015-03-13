@@ -44,6 +44,8 @@ public class TaskAddDateCalcActivity extends OrmLiteBaseActivity<DatabaseHelper>
 
         setElements();
 
+        initAddBtn();
+
     }
 
     private void setElements() {
