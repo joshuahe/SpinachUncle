@@ -3,12 +3,16 @@ package cn.com.spinachzzz.spinachuncle;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.ToggleButton;
 
@@ -28,6 +32,8 @@ public class MainActivityDialogs {
     public MainActivityDialogs(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
+
+    private Map<String, PopupWindow> popupWindowMap = new HashMap<String, PopupWindow>();
 
     public AlertDialog createAddTaskDialog(AlertDialog.Builder builder,
                                            LayoutInflater factory) {
@@ -68,49 +74,6 @@ public class MainActivityDialogs {
         return builder.create();
     }
 
-    /**
-     * public void createGlobelSettingDialog(AlertDialog.Builder builder,
-     * LayoutInflater factory) {
-     * <p/>
-     * final GlobelSettings globelSetting = mainActivity.getGlobelSetting();
-     * final ConfigurationDao configDao = mainActivity.getConfigDao();
-     * <p/>
-     * final View mainSettingView = factory.inflate(R.layout.main_setting,
-     * null);
-     * <p/>
-     * final TimePicker scheduleTime = (TimePicker) mainSettingView
-     * .findViewById(R.id.main_setting_schedule_date);
-     * final ToggleButton autoWifi = (ToggleButton) mainSettingView
-     * .findViewById(R.id.main_setting_auto_wifi_toggle);
-     * final ToggleButton wifiOnly = (ToggleButton) mainSettingView
-     * .findViewById(R.id.main_setting_wifi_only_toggle);
-     * <p/>
-     * Log.i(MainActivity.TAG, globelSetting.toString());
-     * <p/>
-     * scheduleTime.setCurrentHour(globelSetting.getScheduleHour());
-     * scheduleTime.setCurrentMinute(globelSetting.getScheduleMin());
-     * autoWifi.setChecked(globelSetting.getAutoConnect());
-     * wifiOnly.setChecked(globelSetting.getOnlyWifi());
-     * <p/>
-     * builder.setIcon(R.drawable.setting);
-     * builder.setTitle(R.string.settings);
-     * builder.setView(mainSettingView);
-     * builder.setPositiveButton(R.string.apply,
-     * new DialogInterface.OnClickListener() {
-     * public void onClick(DialogInterface dialog, int whichButton) {
-     * globelSetting.setScheduleTime(
-     * scheduleTime.getCurrentHour(),
-     * scheduleTime.getCurrentMinute());
-     * globelSetting.setAutoConnect(autoWifi.isChecked());
-     * globelSetting.setOnlyWifi(wifiOnly.isChecked());
-     * <p/>
-     * configDao.updateGlobelSetting(globelSetting);
-     * //mainActivity.startTimeTask();
-     * }
-     * });
-     * <p/>
-     * }
-     */
 
     public AlertDialog createTaskDialog(Bundle bundle,
                                         AlertDialog.Builder builder, LayoutInflater factory) {
@@ -127,8 +90,47 @@ public class MainActivityDialogs {
                 null);
         builder.setView(taskDialogView);
 
+        initTaskBtn(taskDialogView, task, taskDAO);
+
+        AlertDialog dialog = builder.create();
+        return dialog;
+    }
+
+
+    public void createTaskPopup(Bundle bundle,
+                                View convertView, LayoutInflater factory) {
+
+        final RuntimeExceptionDao<Tasks, String> taskDAO = mainActivity.getTaskRuntimeDao();
+
+        String code = bundle.getString("code");
+
+        final Tasks task = taskDAO.queryForId(code);
+
+        PopupWindow popupWindow = popupWindowMap.get(task.getCode());
+        if (popupWindow == null) {
+            final View taskDialogView = factory.inflate(R.layout.main_list_task,
+                    null);
+
+            initTaskBtn(taskDialogView, task, taskDAO);
+
+            popupWindow = new PopupWindow(taskDialogView, ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            popupWindow.setFocusable(true);
+            popupWindow.setOutsideTouchable(true);
+            popupWindow.update();
+            popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
+            popupWindowMap.put(task.getCode(), popupWindow);
+        }
+
+        popupWindow.showAtLocation(convertView, Gravity.TOP, 0, convertView.getTop() + 200);
+
+    }
+
+    private void initTaskBtn(View taskDialogView, final Tasks task, final RuntimeExceptionDao<Tasks, String> taskDAO) {
         final Button taskStartBtn = (Button) taskDialogView
                 .findViewById(R.id.task_start);
+        final Button taskDeleteBth = (Button) taskDialogView.findViewById(R.id.tast_delete);
         final Button taskOpenBth = (Button) taskDialogView.findViewById(R.id.task_open);
 
         taskStartBtn.setOnClickListener(new View.OnClickListener() {
@@ -141,24 +143,39 @@ public class MainActivityDialogs {
 
                 mainActivity.startService(intent);
 
-                mainActivity.dismissDialog(Constants.TASK_DIALOG_ID);
+                dismissPopupWindow(task);
 
             }
         });
 
-        taskOpenBth.setOnClickListener(new View.OnClickListener(){
+        taskDeleteBth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                taskDAO.deleteById(task.getCode());
+
+                dismissPopupWindow(task);
+
+                mainActivity.finish();
+                mainActivity.startActivity(mainActivity.getIntent());
+            }
+        });
+
+        taskOpenBth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Uri startDir = Uri.fromFile(new File(task.getSavePath()));
                 Intent intent = new Intent();
-                intent.setDataAndType(startDir,"resource/folder");
+                intent.setDataAndType(startDir, "resource/folder");
                 intent.setAction(Intent.ACTION_VIEW);
                 mainActivity.startActivity(intent);
             }
         });
-
-        AlertDialog dialog =  builder.create();
-        return dialog;
     }
 
+    private void dismissPopupWindow(Tasks task) {
+        PopupWindow popupWindow = popupWindowMap.get(task.getCode());
+        if (popupWindow != null) {
+            popupWindow.dismiss();
+        }
+    }
 }

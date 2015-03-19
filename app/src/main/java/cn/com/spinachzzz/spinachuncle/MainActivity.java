@@ -70,6 +70,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
     }
 
+    public MainActivityDialogs getDialogs() {
+        return dialogs;
+    }
 
     private void initBtns(){
 
@@ -127,9 +130,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
             //dialogs.createGlobelSettingDialog(builder, factory);
 
             return builder.create();
-        } else if (id >= Constants.TASK_DIALOG_ID && id < 100) {
-            return dialogs.createTaskDialog(bundle, builder, factory);
-
         }
         return super.onCreateDialog(id);
     }
@@ -137,7 +137,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.getHelper().close();
 
     }
 
