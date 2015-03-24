@@ -26,27 +26,11 @@ public abstract class BaseDownloader implements Runnable {
 
     protected TaskServiceMessageHandler handler;
 
-    //protected TaskSettings taskSetting;
-
-    //protected ConfigurationDao configurationDao;
-
-    protected LocalResourceDao localResourceDao = new LocalResourceDao();
-
     protected Tasks tasks;
 
     public void setHandler(TaskServiceMessageHandler handler) {
         this.handler = handler;
     }
-
-    // public void setTaskSetting(TaskSettings taskSetting) {
-    //this.taskSetting = taskSetting;
-    //}
-
-    /**
-     * public void setConfigurationDao(ConfigurationDao configurationDao) {
-     * this.configurationDao = configurationDao;
-     * }
-     */
 
     @Override
     public void run() {
@@ -95,6 +79,7 @@ public abstract class BaseDownloader implements Runnable {
             throws IOException {
 
         File tempFile = new File(saveFile.getPath()+ Constants.TMP_EXT);
+        CommonUtils.forceMkdir(tempFile);
 
         URL myURL = new URL(url);
         URLConnection conn = myURL.openConnection();

@@ -1,5 +1,15 @@
 package cn.com.spinachzzz.spinachuncle.dao;
 
+import android.util.Log;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,23 +17,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import android.util.Log;
 
 import cn.com.spinachzzz.spinachuncle.Constants;
 import cn.com.spinachzzz.spinachuncle.R;
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
-import cn.com.spinachzzz.spinachuncle.util.DateUtils;
+import cn.com.spinachzzz.spinachuncle.util.CommonUtils;
 import cn.com.spinachzzz.spinachuncle.util.StringUtils;
 
 public class KeywordDownloader extends BaseDownloader {
@@ -36,7 +35,7 @@ public class KeywordDownloader extends BaseDownloader {
         this.tasks = tasks;
     }
 
-    private void fetchList() throws IOException, ClientProtocolException {
+    private void fetchList() throws IOException {
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(tasks.getTargetUrl());
         HttpResponse response = httpclient.execute(httpget);
@@ -48,24 +47,7 @@ public class KeywordDownloader extends BaseDownloader {
             try {
                 String line = null;
                 while ((line = bis.readLine()) != null) {
-                    int pos = line.indexOf(tasks.getKeywordBf());
-                    if (pos != -1) {
-                        int posEnd = line.indexOf(tasks.getKeywordEw(), pos);
-                        if (posEnd != -1
-                                && posEnd + tasks.getKeywordEw().length() > pos
-                                + tasks.getKeywordBf().length()) {
-                            line = line.substring(pos + tasks.getKeywordBf().length(),
-                                    posEnd + tasks.getKeywordEw().length());
-                            String[] sa = line.split("\"");
-                            for (String s : sa) {
-                                if (StringUtils.isURL(s)) {
-                                    list.add(s);
-                                    Log.i(TAG, line);
-                                }
-                            }
-                        }
-
-                    }
+                    checkToAddItem(line);
 
                 }
             } finally {
@@ -76,7 +58,35 @@ public class KeywordDownloader extends BaseDownloader {
         }
     }
 
-    protected void download() throws ClientProtocolException, IOException {
+    private void checkToAddItem(String line) {
+        StringBuilder start = new StringBuilder();
+        start.append(org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordBf()));
+        start.append(org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordSw()));
+
+        int startPoint = line.indexOf(start.toString());
+        if (startPoint != -1) {
+
+            startPoint = startPoint + org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordBf()).length();
+
+            StringBuilder end = new StringBuilder();
+            end.append(org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordEw()));
+            end.append(org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordAf()));
+
+            int endPoint = line.indexOf(end.toString());
+
+            if (endPoint != -1) {
+                endPoint = endPoint + org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordEw()).length();
+
+                if (endPoint > startPoint) {
+                    String aLine = line.substring(startPoint, endPoint);
+                    Log.i(TAG, aLine);
+                    list.add(aLine);
+                }
+            }
+        }
+    }
+
+    protected void download() throws IOException {
         fetchList();
 
         int i = 0;
@@ -87,17 +97,15 @@ public class KeywordDownloader extends BaseDownloader {
             HttpResponse response = httpclient.execute(httpget);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                File folder = new File(LocalResourceDao.ROOT_FOLDER
-                        + "code" + "/"
-                        + DateUtils.formatSimpleDay(new Date()));
 
-                if (!folder.exists()) {
-                    folder.mkdirs();
-                }
                 InputStream instream = entity.getContent();
 
-                File file = new File(folder, Integer.toString(i)
+                File file = new File(tasks.getSavePath(), FilenameUtils.getName(link)
                         + Constants.TMP_EXT);
+
+                CommonUtils.forceMkdir(file);
+
+
                 FileOutputStream fos = null;
                 try {
                     fos = new FileOutputStream(file);
@@ -108,13 +116,13 @@ public class KeywordDownloader extends BaseDownloader {
                     IOUtils.closeQuietly(instream);
                 }
 
-                //localResourceDao.renameFromTmp(file);
+                CommonUtils.renameFromTmp(file);
 
                 i++;
 
-                //sendDownloadingMsg(taskSetting.getLabel() + " "
-                //	+ handler.getString(R.string.download) + ": " + i + "/"
-                //	+ total);
+                sendDownloadingMsg(tasks.getLabel() + " "
+                        + handler.getString(R.string.download) + ": " + i + "/"
+                        + total);
 
             }
 

@@ -80,7 +80,11 @@ public class StringUtils {
         int posS = str.lastIndexOf('/');
         if (posE != -1 && posS != -1 && posE > posS + 1) {
             return str.substring(posS + 1, posE);
-        } else {
+        }
+        else if(posS!=-1&&posE<=posS+1){
+            return str.substring(posS + 1);
+        }
+        else {
             return str;
         }
     }

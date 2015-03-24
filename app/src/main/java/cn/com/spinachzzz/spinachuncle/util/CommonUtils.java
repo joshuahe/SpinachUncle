@@ -1,6 +1,11 @@
 package cn.com.spinachzzz.spinachuncle.util;
 
+import android.util.Log;
+
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
+import java.io.IOException;
 
 import cn.com.spinachzzz.spinachuncle.Constants;
 
@@ -8,6 +13,9 @@ import cn.com.spinachzzz.spinachuncle.Constants;
  * Created by Jing on 13/03/15.
  */
 public class CommonUtils {
+
+    public static final String TAG = CommonUtils.class.getSimpleName();
+
 
     public static void renameFromTmp(File file) {
         if (file.isFile() && file.getName().endsWith(Constants.TMP_EXT)) {
@@ -17,5 +25,17 @@ public class CommonUtils {
                 file.renameTo(new File(file.getParentFile().getAbsolutePath() + "/" + newName));
             }
         }
+    }
+
+    public static void forceMkdir(File file) {
+
+        if (!file.getParentFile().exists()) {
+            try {
+                FileUtils.forceMkdir(file.getParentFile());
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+
     }
 }
