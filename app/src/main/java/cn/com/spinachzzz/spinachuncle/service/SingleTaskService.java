@@ -14,6 +14,7 @@ import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.WifiUtils;
 import cn.com.spinachzzz.spinachuncle.vo.GlobelSettings;
+import cn.com.spinachzzz.spinachuncle.vo.TaskExtraVO;
 
 public class SingleTaskService extends Service {
 
@@ -26,6 +27,7 @@ public class SingleTaskService extends Service {
         Log.i(TAG, "SingleTaskService-->onStartCommand");
 
         Tasks task = (Tasks)intent.getSerializableExtra("task");
+        TaskExtraVO extra = (TaskExtraVO)intent.getSerializableExtra("extra");
 
         TaskServiceMessageHandler handler = new TaskServiceMessageHandler(this);
 
@@ -34,9 +36,9 @@ public class SingleTaskService extends Service {
 
             BaseDownloader downloader = DownloaderFactory
                     .createDownloader(task);
+            downloader.setTaskExtraVO(extra);
             downloader.setHandler(handler);
 
-            Log.i(TAG, "submit");
             taskPool.submit(downloader);
 
 

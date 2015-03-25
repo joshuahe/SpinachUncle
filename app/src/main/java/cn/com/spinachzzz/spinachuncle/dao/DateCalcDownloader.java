@@ -21,9 +21,18 @@ public class DateCalcDownloader extends BaseDownloader {
         this.tasks = tasks;
     }
 
+    private Date getWorkDate() {
+        if (taskExtraVO != null && taskExtraVO.getDate() != null) {
+            return taskExtraVO.getDate();
+        }
+
+        return new Date();
+    }
+
     @Override
     protected void download() throws Exception {
-        String url = StringUtils.replaceWithDateFormat(new Date(), tasks.getTargetUrl());
+
+        String url = StringUtils.replaceWithDateFormat(getWorkDate(), tasks.getTargetUrl());
 
         Log.i(TAG, url);
 
@@ -36,7 +45,7 @@ public class DateCalcDownloader extends BaseDownloader {
             super.downFile(url, saveFile, tasks.getLabel() + " is downloading ");
 
         } else {
-            throw new MessageException("File "+saveFile.getAbsolutePath()+" already exist.");
+            throw new MessageException("File " + saveFile.getAbsolutePath() + " already exist.");
         }
     }
 

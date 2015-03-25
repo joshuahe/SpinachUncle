@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.ToggleButton;
@@ -24,6 +25,8 @@ import java.util.Map;
 
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.service.SingleTaskService;
+import cn.com.spinachzzz.spinachuncle.util.DateUtils;
+import cn.com.spinachzzz.spinachuncle.vo.TaskExtraVO;
 import cn.com.spinachzzz.spinachuncle.vo.TaskType;
 
 public class MainActivityDialogs {
@@ -129,11 +132,20 @@ public class MainActivityDialogs {
     }
 
     private void initTaskBtn(View taskDialogView, final Tasks task, final RuntimeExceptionDao<Tasks, String> taskDAO) {
+        final DatePicker datePicker = (DatePicker) taskDialogView.findViewById(R.id.task_date_set);
+        datePicker.setVisibility(View.INVISIBLE);
         final Button taskStartBtn = (Button) taskDialogView
                 .findViewById(R.id.task_start);
         final Button taskEditBth = (Button) taskDialogView.findViewById(R.id.task_edit);
         final Button taskDeleteBth = (Button) taskDialogView.findViewById(R.id.tast_delete);
         final Button taskOpenBth = (Button) taskDialogView.findViewById(R.id.task_open);
+
+        if(task.getTaskType() == TaskType.DATE_CALC){
+           // datePicker.setCalendarViewShown(false);
+            datePicker.setVisibility(View.VISIBLE);
+        }
+
+        final TaskExtraVO extraVO = new TaskExtraVO();
 
         taskStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,6 +154,8 @@ public class MainActivityDialogs {
                 Intent intent = new Intent();
                 intent.setClass(mainActivity, SingleTaskService.class);
                 intent.putExtra("task", task);
+                extraVO.setDate(DateUtils.getDateFromDatePicker(datePicker));
+                intent.putExtra("extra", extraVO);
 
                 mainActivity.startService(intent);
 

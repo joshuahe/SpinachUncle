@@ -1,5 +1,7 @@
 package cn.com.spinachzzz.spinachuncle.util;
 
+import android.widget.DatePicker;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -81,5 +83,16 @@ public class DateUtils {
             return true;
         }
         return false;
+    }
+
+    public static java.util.Date getDateFromDatePicker(DatePicker datePicker){
+        int day = datePicker.getDayOfMonth();
+        int month = datePicker.getMonth();
+        int year =  datePicker.getYear();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+
+        return calendar.getTime();
     }
 }

@@ -19,6 +19,7 @@ import cn.com.spinachzzz.spinachuncle.exception.MessageException;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.CalcUtils;
 import cn.com.spinachzzz.spinachuncle.util.CommonUtils;
+import cn.com.spinachzzz.spinachuncle.vo.TaskExtraVO;
 
 public abstract class BaseDownloader implements Runnable {
 
@@ -28,8 +29,14 @@ public abstract class BaseDownloader implements Runnable {
 
     protected Tasks tasks;
 
+    protected TaskExtraVO taskExtraVO;
+
     public void setHandler(TaskServiceMessageHandler handler) {
         this.handler = handler;
+    }
+
+    public void setTaskExtraVO(TaskExtraVO taskExtraVO) {
+        this.taskExtraVO = taskExtraVO;
     }
 
     @Override
