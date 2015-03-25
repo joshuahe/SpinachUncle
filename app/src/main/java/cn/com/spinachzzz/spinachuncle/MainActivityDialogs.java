@@ -24,6 +24,7 @@ import java.util.Map;
 
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.service.SingleTaskService;
+import cn.com.spinachzzz.spinachuncle.vo.TaskType;
 
 public class MainActivityDialogs {
 
@@ -51,7 +52,7 @@ public class MainActivityDialogs {
                 Intent intent = new Intent();
 
                 intent.setClass(mainActivity,
-                        TaskAddKeywordActivity.class);
+                        TaskKeywordActivity.class);
                 mainActivity.startActivity(intent);
             }
         });
@@ -66,7 +67,7 @@ public class MainActivityDialogs {
                 Intent intent = new Intent();
 
                 intent.setClass(mainActivity,
-                        TaskAddDateCalcActivity.class);
+                        TaskDateCalcActivity.class);
                 mainActivity.startActivity(intent);
             }
         });
@@ -130,6 +131,7 @@ public class MainActivityDialogs {
     private void initTaskBtn(View taskDialogView, final Tasks task, final RuntimeExceptionDao<Tasks, String> taskDAO) {
         final Button taskStartBtn = (Button) taskDialogView
                 .findViewById(R.id.task_start);
+        final Button taskEditBth = (Button) taskDialogView.findViewById(R.id.task_edit);
         final Button taskDeleteBth = (Button) taskDialogView.findViewById(R.id.tast_delete);
         final Button taskOpenBth = (Button) taskDialogView.findViewById(R.id.task_open);
 
@@ -144,6 +146,29 @@ public class MainActivityDialogs {
                 mainActivity.startService(intent);
 
                 dismissPopupWindow(task);
+
+            }
+        });
+
+        taskEditBth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (task.getTaskType() == TaskType.KEYWORD) {
+
+                    Intent intent = new Intent();
+                    intent.setClass(mainActivity, TaskKeywordActivity.class);
+                    intent.putExtra("task", task);
+
+                    mainActivity.startActivity(intent);
+
+                }
+                else if(task.getTaskType() == TaskType.DATE_CALC){
+                    Intent intent = new Intent();
+                    intent.setClass(mainActivity, TaskDateCalcActivity.class);
+                    intent.putExtra("task", task);
+
+                    mainActivity.startActivity(intent);
+                }
 
             }
         });

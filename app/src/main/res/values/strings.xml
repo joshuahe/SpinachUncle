@@ -5,6 +5,7 @@
     <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="add">Add</string>
+    <string name="save">Save</string>
     <string name="key_word">Key Word</string>
     <string name="date_calc">Date Calc</string>
 
@@ -55,10 +56,10 @@
     </string-array>
 
     <string name="about_version">Version: 0.1 beta</string>
-    <string name="title_activity_task_add_keyword">TaskAddKeywordActivity</string>
+    <string name="title_activity_task_keyword">TaskKeywordActivity</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_task_add_date_calc">TaskAddDateCalcActivity</string>
+    <string name="title_activity_task_date_calc">TaskDateCalcActivity</string>
 
 </resources>

@@ -56,12 +56,12 @@
         <service android:name=".service.ScheduleTaskService" />
 
         <activity
-            android:name=".TaskAddKeywordActivity"
-            android:label="@string/title_activity_task_add_keyword" >
+            android:name=".TaskKeywordActivity"
+            android:label="@string/title_activity_task_keyword" >
         </activity>
         <activity
-            android:name=".TaskAddDateCalcActivity"
-            android:label="@string/title_activity_task_add_date_calc" >
+            android:name=".TaskDateCalcActivity"
+            android:label="@string/title_activity_task_date_calc" >
         </activity>
     </application>
 

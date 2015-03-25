@@ -60,11 +60,11 @@
         android:gravity="bottom">
 
         <Button
-            android:id="@+id/task_keyword_add_btn"
+            android:id="@+id/task_keyword_save_btn"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:text="@string/add" />
+            android:text="@string/save" />
 
     </LinearLayout>
 
