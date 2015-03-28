@@ -14,12 +14,13 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import cn.com.spinachzzz.spinachuncle.Constants;
+import cn.com.spinachzzz.spinachuncle.R;
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.exception.MessageException;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.CalcUtils;
 import cn.com.spinachzzz.spinachuncle.util.CommonUtils;
-import cn.com.spinachzzz.spinachuncle.vo.TaskExtraVO;
+import cn.com.spinachzzz.spinachuncle.vo.TaskParamVO;
 
 public abstract class BaseDownloader implements Runnable {
 
@@ -27,16 +28,10 @@ public abstract class BaseDownloader implements Runnable {
 
     protected TaskServiceMessageHandler handler;
 
-    protected Tasks tasks;
-
-    protected TaskExtraVO taskExtraVO;
+    protected TaskParamVO taskParam;
 
     public void setHandler(TaskServiceMessageHandler handler) {
         this.handler = handler;
-    }
-
-    public void setTaskExtraVO(TaskExtraVO taskExtraVO) {
-        this.taskExtraVO = taskExtraVO;
     }
 
     @Override
@@ -45,21 +40,8 @@ public abstract class BaseDownloader implements Runnable {
 
         try {
             download();
-            /**
 
-             localResourceDao.clean(taskSetting);
-
-             // configurationDao.updateTaskSetting(taskSetting);
-
-             Message message = new Message();
-             message.what = TaskServiceMessageHandler.DOWNLOAD_COMPLETE;
-             message.getData().putString(
-             TaskServiceMessageHandler.MSG_KEY,
-             taskSetting.getLabel() + " "
-             + handler.getString(R.string.download_finished));
-
-             handler.sendMessage(message);
-             **/
+            sendDownloadFinishMessage();
 
         } catch (Exception e) {
             Log.w(TAG, e);
@@ -144,5 +126,20 @@ public abstract class BaseDownloader implements Runnable {
             sendDownloadingMsg(createPercentMsg(percent, msg));
         }
         return percent;
+    }
+
+    private void sendDownloadFinishMessage(){
+
+         Tasks task = taskParam.getTask();
+
+         Message message = new Message();
+         message.what = TaskServiceMessageHandler.DOWNLOAD_COMPLETE;
+         message.getData().putString(
+         TaskServiceMessageHandler.MSG_KEY,
+                 task.getLabel() + " "
+         + handler.getString(R.string.download_finished));
+
+         handler.sendMessage(message);
+         handler.cancelAll();
     }
 }

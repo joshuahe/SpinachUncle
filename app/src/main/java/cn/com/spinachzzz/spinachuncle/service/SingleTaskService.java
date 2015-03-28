@@ -2,19 +2,15 @@ package cn.com.spinachzzz.spinachuncle.service;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import cn.com.spinachzzz.spinachuncle.Constants;
 import cn.com.spinachzzz.spinachuncle.R;
 import cn.com.spinachzzz.spinachuncle.dao.BaseDownloader;
 import cn.com.spinachzzz.spinachuncle.dao.DownloaderFactory;
-import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
 import cn.com.spinachzzz.spinachuncle.util.WifiUtils;
-import cn.com.spinachzzz.spinachuncle.vo.GlobelSettings;
-import cn.com.spinachzzz.spinachuncle.vo.TaskExtraVO;
+import cn.com.spinachzzz.spinachuncle.vo.TaskParamVO;
 
 public class SingleTaskService extends Service {
 
@@ -26,8 +22,7 @@ public class SingleTaskService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "SingleTaskService-->onStartCommand");
 
-        Tasks task = (Tasks)intent.getSerializableExtra("task");
-        TaskExtraVO extra = (TaskExtraVO)intent.getSerializableExtra("extra");
+        TaskParamVO taskParam = (TaskParamVO)intent.getSerializableExtra("taskParam");
 
         TaskServiceMessageHandler handler = new TaskServiceMessageHandler(this);
 
@@ -35,8 +30,7 @@ public class SingleTaskService extends Service {
             TaskPool taskPool = TaskPool.getInstance();
 
             BaseDownloader downloader = DownloaderFactory
-                    .createDownloader(task);
-            downloader.setTaskExtraVO(extra);
+                    .createDownloader(taskParam);
             downloader.setHandler(handler);
 
             taskPool.submit(downloader);

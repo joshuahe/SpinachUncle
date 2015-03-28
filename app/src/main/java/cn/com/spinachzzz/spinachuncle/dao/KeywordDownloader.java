@@ -23,7 +23,7 @@ import cn.com.spinachzzz.spinachuncle.Constants;
 import cn.com.spinachzzz.spinachuncle.R;
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.util.CommonUtils;
-import cn.com.spinachzzz.spinachuncle.util.StringUtils;
+import cn.com.spinachzzz.spinachuncle.vo.TaskParamVO;
 
 public class KeywordDownloader extends BaseDownloader {
 
@@ -31,13 +31,13 @@ public class KeywordDownloader extends BaseDownloader {
 
     private List<String> list = new ArrayList<String>();
 
-    public KeywordDownloader(Tasks tasks) {
-        this.tasks = tasks;
+    public KeywordDownloader(TaskParamVO taskParam) {
+        this.taskParam = taskParam;
     }
 
     private void fetchList() throws IOException {
         HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(tasks.getTargetUrl());
+        HttpGet httpget = new HttpGet(taskParam.getTask().getTargetUrl());
         HttpResponse response = httpclient.execute(httpget);
         HttpEntity entity = response.getEntity();
         if (entity != null) {
@@ -59,6 +59,8 @@ public class KeywordDownloader extends BaseDownloader {
     }
 
     private void checkToAddItem(String line) {
+        Tasks tasks = taskParam.getTask();
+
         StringBuilder start = new StringBuilder();
         start.append(org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordBf()));
         start.append(org.apache.commons.lang3.StringUtils.defaultString(tasks.getKeywordSw()));
@@ -100,7 +102,7 @@ public class KeywordDownloader extends BaseDownloader {
 
                 InputStream instream = entity.getContent();
 
-                File file = new File(tasks.getSavePath(), FilenameUtils.getName(link)
+                File file = new File(taskParam.getTask().getSavePath(), FilenameUtils.getName(link)
                         + Constants.TMP_EXT);
 
                 CommonUtils.forceMkdir(file);
@@ -120,7 +122,7 @@ public class KeywordDownloader extends BaseDownloader {
 
                 i++;
 
-                sendDownloadingMsg(tasks.getLabel() + " "
+                sendDownloadingMsg(taskParam.getTask().getLabel() + " "
                         + handler.getString(R.string.download) + ": " + i + "/"
                         + total);
 

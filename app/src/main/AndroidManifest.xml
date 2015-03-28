@@ -63,6 +63,12 @@
             android:name=".TaskDateCalcActivity"
             android:label="@string/title_activity_task_date_calc" >
         </activity>
+
+        <receiver android:name=".receiver.MainMessageReceiver" >
+            <intent-filter >
+                <action android:name="cn.com.spinachzzz.spinachuncle.receiver.MainMessageReceiver"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

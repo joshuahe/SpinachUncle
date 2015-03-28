@@ -1,7 +1,6 @@
 package cn.com.spinachzzz.spinachuncle;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -15,18 +14,21 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
-import android.widget.ToggleButton;
+import android.widget.TextView;
 
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.service.SingleTaskService;
+import cn.com.spinachzzz.spinachuncle.util.CommonUtils;
 import cn.com.spinachzzz.spinachuncle.util.DateUtils;
-import cn.com.spinachzzz.spinachuncle.vo.TaskExtraVO;
+import cn.com.spinachzzz.spinachuncle.util.StringUtils;
+import cn.com.spinachzzz.spinachuncle.vo.TaskParamVO;
 import cn.com.spinachzzz.spinachuncle.vo.TaskType;
 
 public class MainActivityDialogs {
@@ -78,29 +80,6 @@ public class MainActivityDialogs {
         return builder.create();
     }
 
-
-    public AlertDialog createTaskDialog(Bundle bundle,
-                                        AlertDialog.Builder builder, LayoutInflater factory) {
-
-        final RuntimeExceptionDao<Tasks, String> taskDAO = mainActivity.getTaskRuntimeDao();
-
-        String code = bundle.getString("code");
-
-        Log.i(MainActivity.TAG, "code:" + code);
-
-        final Tasks task = taskDAO.queryForId(code);
-
-        final View taskDialogView = factory.inflate(R.layout.main_list_task,
-                null);
-        builder.setView(taskDialogView);
-
-        initTaskBtn(taskDialogView, task, taskDAO);
-
-        AlertDialog dialog = builder.create();
-        return dialog;
-    }
-
-
     public void createTaskPopup(Bundle bundle,
                                 View convertView, LayoutInflater factory) {
 
@@ -133,19 +112,35 @@ public class MainActivityDialogs {
 
     private void initTaskBtn(View taskDialogView, final Tasks task, final RuntimeExceptionDao<Tasks, String> taskDAO) {
         final DatePicker datePicker = (DatePicker) taskDialogView.findViewById(R.id.task_date_set);
-        datePicker.setVisibility(View.INVISIBLE);
+        datePicker.setVisibility(View.GONE);
+        final TextView taskPreview = (TextView) taskDialogView.findViewById(R.id.task_preview);
         final Button taskStartBtn = (Button) taskDialogView
                 .findViewById(R.id.task_start);
         final Button taskEditBth = (Button) taskDialogView.findViewById(R.id.task_edit);
         final Button taskDeleteBth = (Button) taskDialogView.findViewById(R.id.tast_delete);
         final Button taskOpenBth = (Button) taskDialogView.findViewById(R.id.task_open);
 
-        if(task.getTaskType() == TaskType.DATE_CALC){
-           // datePicker.setCalendarViewShown(false);
+        if (task.getTaskType() == TaskType.DATE_CALC) {
+            CommonUtils.trySetCalendarShow(datePicker, false);
             datePicker.setVisibility(View.VISIBLE);
+
+            Calendar cal = Calendar.getInstance();
+
+            datePicker.init(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener(){
+                @Override
+                public void onDateChanged(DatePicker datePicker, int i, int i2, int i3) {
+                    onTaskDatePickerChanged(datePicker, task, taskPreview);
+                }
+            });
+
+            onTaskDatePickerChanged(datePicker, task, taskPreview);
+
+        }else{
+            taskPreview.setText(task.getTargetUrl());
         }
 
-        final TaskExtraVO extraVO = new TaskExtraVO();
+        final TaskParamVO paramVO = new TaskParamVO();
+        paramVO.setTask(task);
 
         taskStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,9 +148,8 @@ public class MainActivityDialogs {
 
                 Intent intent = new Intent();
                 intent.setClass(mainActivity, SingleTaskService.class);
-                intent.putExtra("task", task);
-                extraVO.setDate(DateUtils.getDateFromDatePicker(datePicker));
-                intent.putExtra("extra", extraVO);
+                paramVO.setDate(DateUtils.getDateFromDatePicker(datePicker));
+                intent.putExtra("taskParam", paramVO);
 
                 mainActivity.startService(intent);
 
@@ -175,8 +169,7 @@ public class MainActivityDialogs {
 
                     mainActivity.startActivity(intent);
 
-                }
-                else if(task.getTaskType() == TaskType.DATE_CALC){
+                } else if (task.getTaskType() == TaskType.DATE_CALC) {
                     Intent intent = new Intent();
                     intent.setClass(mainActivity, TaskDateCalcActivity.class);
                     intent.putExtra("task", task);
@@ -209,6 +202,11 @@ public class MainActivityDialogs {
                 mainActivity.startActivity(intent);
             }
         });
+    }
+
+    private void onTaskDatePickerChanged(DatePicker datePicker, Tasks task, TextView taskPreview) {
+        String url = StringUtils.replaceWithDateFormat(DateUtils.getDateFromDatePicker(datePicker), task.getTargetUrl());
+        taskPreview.setText(url);
     }
 
     private void dismissPopupWindow(Tasks task) {

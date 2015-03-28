@@ -1,11 +1,13 @@
 package cn.com.spinachzzz.spinachuncle.util;
 
 import android.util.Log;
+import android.widget.DatePicker;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import cn.com.spinachzzz.spinachuncle.Constants;
 
@@ -37,5 +39,16 @@ public class CommonUtils {
             }
         }
 
+    }
+
+    public static void trySetCalendarShow(DatePicker datePicker, boolean show){
+        int currentApiVersionVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentApiVersionVersion >= 11) {
+            try {
+                Method m = datePicker.getClass().getMethod("setCalendarViewShown", boolean.class);
+                m.invoke(datePicker, show);
+            }
+            catch (Exception e) {}
+        }
     }
 }

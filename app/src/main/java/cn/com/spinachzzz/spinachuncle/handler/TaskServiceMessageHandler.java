@@ -6,9 +6,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import cn.com.spinachzzz.spinachuncle.Constants;
 import cn.com.spinachzzz.spinachuncle.MainActivity;
 import cn.com.spinachzzz.spinachuncle.R;
 
@@ -30,75 +33,104 @@ public class TaskServiceMessageHandler extends Handler {
     public final static String MSG_KEY = "MSG";
 
     public TaskServiceMessageHandler(Context context) {
-	super();
-	this.context = context;
+        super();
+        this.context = context;
     }
-    
-    public String getString(int resId){
-	return context.getString(resId);
+
+    public String getString(int resId) {
+        return context.getString(resId);
     }
 
     public void updateMessage(String msgTitle, String msgContent) {
-	notification.tickerText = msgTitle;
-	notification.setLatestEventInfo(context, msgTitle, msgContent,
-		contentIntent);
+        notification.tickerText = msgTitle;
+        notification.setLatestEventInfo(context, msgTitle, msgContent,
+                contentIntent);
 
-	manager.notify(NOTIFY_ID, notification);
+        manager.notify(NOTIFY_ID, notification);
+        broadcastMainMessage(msgContent);
     }
 
     public void startNotify() {
-	manager = (NotificationManager) context
-		.getSystemService(Service.NOTIFICATION_SERVICE);
-	Intent intent = new Intent(context, MainActivity.class);
-	contentIntent = PendingIntent.getActivity(context, 0, intent,
-		PendingIntent.FLAG_UPDATE_CURRENT);
+        String message = context.getString(R.string.download_start);
 
-	notification = new Notification();
-	notification.icon = R.drawable.logo_down;
-	notification.tickerText = context.getText(R.string.start_download);
-	notification.when = System.currentTimeMillis();
+        manager = (NotificationManager) context
+                .getSystemService(Service.NOTIFICATION_SERVICE);
+        Intent intent = new Intent(context, MainActivity.class);
+        contentIntent = PendingIntent.getActivity(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-	notification.setLatestEventInfo(context,
-		context.getString(R.string.download_start),
-		context.getString(R.string.download_start), contentIntent);
+        notification = new Notification();
+        notification.icon = R.drawable.logo_down;
+        notification.tickerText = context.getText(R.string.start_download);
+        notification.when = System.currentTimeMillis();
 
-	manager.notify(NOTIFY_ID, notification);
+        notification.setLatestEventInfo(context,
+                message, message
+                , contentIntent);
+
+        manager.notify(NOTIFY_ID, notification);
+        broadcastMainMessage(message);
     }
 
     @Override
     public void handleMessage(Message msg) {
-	notification = new Notification();
-	notification.icon = R.drawable.logo_down;
-	notification.when = System.currentTimeMillis();
+        notification = new Notification();
+        notification.icon = R.drawable.logo_down;
+        notification.when = System.currentTimeMillis();
 
-	switch (msg.what) {
-	case DOWNLOAD_COMPLETE:
-	    notification.tickerText = context.getText(R.string.download_succ);
-	    notification.setLatestEventInfo(context, context
-		    .getString(R.string.download_succ), msg.getData()
-		    .getString(MSG_KEY), contentIntent);
+        switch (msg.what) {
+            case DOWNLOAD_COMPLETE:
+                notification.tickerText = context.getText(R.string.download_succ);
+                notification.setLatestEventInfo(context, context
+                        .getString(R.string.download_succ), msg.getData()
+                        .getString(MSG_KEY), contentIntent);
 
-	    break;
-	case DOWNLOAD_FAIL:
-	    notification.tickerText = context.getText(R.string.download_fail);
-	    notification.setLatestEventInfo(context, context
-		    .getString(R.string.download_fail), msg.getData()
-		    .getString(MSG_KEY), contentIntent);
-	    break;
+                break;
+            case DOWNLOAD_FAIL:
+                notification.tickerText = context.getText(R.string.download_fail);
+                notification.setLatestEventInfo(context, context
+                        .getString(R.string.download_fail), msg.getData()
+                        .getString(MSG_KEY), contentIntent);
 
-	case DOWNLOADING:
-	    notification.tickerText = context.getText(R.string.downloading);
-	    notification.setLatestEventInfo(context, context
-		    .getString(R.string.downloading),
-		    msg.getData().getString(MSG_KEY), contentIntent);
-	    break;
-	}
+                break;
 
-//	if (msg.what != DOWNLOADING) {
-//	    notification.defaults = Notification.DEFAULT_ALL;
-//	}
+            case DOWNLOADING:
+                notification.tickerText = context.getText(R.string.downloading);
+                notification.setLatestEventInfo(context, context
+                                .getString(R.string.downloading),
+                        msg.getData().getString(MSG_KEY), contentIntent);
+                break;
+        }
 
-	manager.notify(NOTIFY_ID, notification);
+
+        manager.notify(NOTIFY_ID, notification);
+        broadcastMainMessage(msg.getData().getString(MSG_KEY));
     }
+
+    private void broadcastMainMessage(String message) {
+        Intent intent = new Intent(Constants.MAIN_MESSAGE_BROADCAST);
+        Bundle extras = new Bundle();
+        extras.putString("message", message);
+        intent.putExtras(extras);
+        context.sendBroadcast(intent);
+    }
+
+    public void cancelNotification(){
+        cancelNotification(context);
+    }
+
+    public void cancelAll(){
+        NotificationManager manager = (NotificationManager) context
+                .getSystemService(MainActivity.NOTIFICATION_SERVICE);
+        manager.cancelAll();
+    }
+
+    public static void cancelNotification(Context context) {
+        NotificationManager manager = (NotificationManager) context
+                .getSystemService(MainActivity.NOTIFICATION_SERVICE);
+        manager.cancel(TaskServiceMessageHandler.NOTIFY_ID);
+    }
+
+
 
 }

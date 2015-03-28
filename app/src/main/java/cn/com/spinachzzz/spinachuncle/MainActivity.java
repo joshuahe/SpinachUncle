@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
@@ -24,6 +26,7 @@ import cn.com.spinachzzz.spinachuncle.business.ApplicationContext;
 import cn.com.spinachzzz.spinachuncle.dao.DatabaseHelper;
 import cn.com.spinachzzz.spinachuncle.domain.Tasks;
 import cn.com.spinachzzz.spinachuncle.handler.TaskServiceMessageHandler;
+import cn.com.spinachzzz.spinachuncle.receiver.MainMessageReceiver;
 
 public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -31,6 +34,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
     private ListView listView;
 
     private Button addBtn;
+
+    private TextView messageTextView;
 
     private MainActivityDialogs dialogs;
 
@@ -44,6 +49,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         listView = (ListView) this.findViewById(R.id.main_list_view);
 
         addBtn = (Button) this.findViewById(R.id.main_btn_add);
+
+        messageTextView = (TextView) this.findViewById(R.id.main_message);
 
         taskRuntimeDao = this.getHelper().getTasksDao();
 
@@ -64,9 +71,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
         initBtns();
 
-        NotificationManager manager = (NotificationManager) this
-                .getSystemService(MainActivity.NOTIFICATION_SERVICE);
-        manager.cancel(TaskServiceMessageHandler.NOTIFY_ID);
+        initReceiver();
+
+        TaskServiceMessageHandler.cancelNotification(this);
 
     }
 
@@ -74,7 +81,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         return dialogs;
     }
 
-    private void initBtns(){
+    private void initBtns() {
 
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +91,18 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
             }
         });
     }
+
+    private void initReceiver() {
+        MainMessageReceiver receiver = new MainMessageReceiver();
+        receiver.setMainActivity(this);
+        IntentFilter intentFilter = new IntentFilter(Constants.MAIN_MESSAGE_BROADCAST);
+        registerReceiver(receiver, intentFilter);
+    }
+
+    public void updateMessages(String message) {
+        messageTextView.setText(message);
+    }
+
 
     public RuntimeExceptionDao<Tasks, String> getTaskRuntimeDao() {
         return taskRuntimeDao;
@@ -122,11 +141,9 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater factory = LayoutInflater.from(this);
 
-        if (id == Constants.TASK_ADD_DIALOG_ID){
+        if (id == Constants.TASK_ADD_DIALOG_ID) {
             return dialogs.createAddTaskDialog(builder, factory);
-        }
-
-        else if (id == Constants.MAIN_SETTING_DIALOG_ID) {
+        } else if (id == Constants.MAIN_SETTING_DIALOG_ID) {
             //dialogs.createGlobelSettingDialog(builder, factory);
 
             return builder.create();
