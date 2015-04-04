@@ -115,16 +115,6 @@ public class TaskServiceMessageHandler extends Handler {
         context.sendBroadcast(intent);
     }
 
-    public void cancelNotification(){
-        cancelNotification(context);
-    }
-
-    public void cancelAll(){
-        NotificationManager manager = (NotificationManager) context
-                .getSystemService(MainActivity.NOTIFICATION_SERVICE);
-        manager.cancelAll();
-    }
-
     public static void cancelNotification(Context context) {
         NotificationManager manager = (NotificationManager) context
                 .getSystemService(MainActivity.NOTIFICATION_SERVICE);

@@ -41,6 +41,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
     private RuntimeExceptionDao<Tasks, String> taskRuntimeDao;
 
+    private MainMessageReceiver receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +55,8 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         messageTextView = (TextView) this.findViewById(R.id.main_message);
 
         taskRuntimeDao = this.getHelper().getTasksDao();
+
+        initBtns();
 
         List<Tasks> tasks = taskRuntimeDao.queryForAll();
 
@@ -68,8 +72,6 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
         listView.setAdapter(adapter);
 
         dialogs = new MainActivityDialogs(this);
-
-        initBtns();
 
         initReceiver();
 
@@ -93,7 +95,7 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
     }
 
     private void initReceiver() {
-        MainMessageReceiver receiver = new MainMessageReceiver();
+        receiver = new MainMessageReceiver();
         receiver.setMainActivity(this);
         IntentFilter intentFilter = new IntentFilter(Constants.MAIN_MESSAGE_BROADCAST);
         registerReceiver(receiver, intentFilter);
@@ -152,9 +154,16 @@ public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        this.unregisterReceiver(receiver);
+        super.onDestroy();
     }
 
 }

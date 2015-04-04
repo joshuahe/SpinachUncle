@@ -8,28 +8,28 @@
     <ListView
         android:id="@+id/main_list_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="408dp"
         android:scrollingCache="false"
         android:divider="@drawable/line"></ListView>
+
+    <TextView
+        android:id="@+id/main_message"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+     />
+
+    <Button
+        android:id="@+id/main_btn_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:text="@string/add" />
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
         android:gravity="bottom">
-
-        <TextView
-            android:id="@+id/main_message"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            />
-
-        <Button
-            android:id="@+id/main_btn_add"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="@string/add" />
 
     </LinearLayout>
 

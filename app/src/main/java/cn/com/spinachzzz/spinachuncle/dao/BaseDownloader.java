@@ -140,6 +140,5 @@ public abstract class BaseDownloader implements Runnable {
          + handler.getString(R.string.download_finished));
 
          handler.sendMessage(message);
-         handler.cancelAll();
     }
 }
