@@ -88,6 +88,18 @@ public class KeywordDownloader extends BaseDownloader {
         }
     }
 
+    private String fixProtocol(String aUrl) {
+        if (!aUrl.startsWith("http")) {
+            if (taskParam.getTask().getTargetUrl().startsWith(Constants.HTTPS)) {
+                return Constants.HTTPS + aUrl;
+            } else {
+                return Constants.HTTP + aUrl;
+            }
+        }
+
+        return aUrl;
+    }
+
     protected void download() throws IOException {
         fetchList();
 
@@ -95,7 +107,7 @@ public class KeywordDownloader extends BaseDownloader {
         int total = list.size();
         for (String link : list) {
             HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(link);
+            HttpGet httpget = new HttpGet(fixProtocol(link));
             HttpResponse response = httpclient.execute(httpget);
             HttpEntity entity = response.getEntity();
             if (entity != null) {

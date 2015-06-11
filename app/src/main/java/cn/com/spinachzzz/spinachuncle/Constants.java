@@ -2,6 +2,9 @@ package cn.com.spinachzzz.spinachuncle;
 
 public class Constants {
 
+    public static final String HTTP = "http://";
+    public static final String HTTPS = "https://";
+
     public static final String TMP_EXT = ".tmp";
 
     public static final String PICS = "PICS";
